@@ -7,8 +7,10 @@ fixed before they become a problem on match day.
 """
 
 import streamlit as st
-from utils.genai_client import ask_genai
+
 from data.mock_data import facility_status
+from utils.genai_client import ask_genai
+from utils.status_icons import facility_ok_icon
 
 SYSTEM_PROMPT = """You are an accessibility-planning AI for a FIFA World Cup 2026 stadium.
 Given a fan's stated accessibility needs, produce a short, practical personalized
@@ -61,8 +63,7 @@ def render():
     with tab2:
         st.markdown("**Live accessibility-equipment status**")
         for f in facility_status():
-            icon = "🔴" if f["status"] not in ("normal",) else "🟢"
-            st.write(f"{icon} {f['facility']} — {f['status']}")
+            st.write(f"{facility_ok_icon(f['status'])} {f['facility']} — {f['status']}")
         st.caption("Flagged items are auto-routed to the facilities team with priority "
                     "if they affect accessible seating, ramps, or lifts.")
 

@@ -8,8 +8,9 @@ stay accurate to this specific venue instead of hallucinated.
 """
 
 import streamlit as st
-from utils.genai_client import ask_genai
+
 from data.mock_data import LANGUAGES
+from utils.genai_client import ask_genai
 
 STADIUM_FACTS = """
 Venue: MetLife-style Host Stadium, Capacity 82,500.
@@ -61,7 +62,7 @@ def render():
     st.markdown("**Quick-ask templates**")
     qcols = st.columns(3)
     templates = ["Where can I refill water bottles?", "Is there a prayer/quiet room?", "What's the bag policy?"]
-    for c, t in zip(qcols, templates):
+    for c, t in zip(qcols, templates, strict=True):
         c.button(t, key=f"tmpl_{t}", on_click=lambda t=t: st.session_state.update({"ml_prefill": t}))
 
     with st.expander("Why this matters for FIFA 2026"):

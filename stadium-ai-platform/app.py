@@ -9,7 +9,7 @@ Run with:
 import streamlit as st
 from dotenv import load_dotenv
 
-from modules import navigation, multilingual, accessibility, operations
+from modules import accessibility, multilingual, navigation, operations
 from utils.genai_client import is_live
 
 load_dotenv()

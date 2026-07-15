@@ -8,8 +8,10 @@ room commander would want every 10-15 minutes on match day.
 """
 
 import streamlit as st
-from data.mock_data import gate_density, transport_status, facility_status, weather, live_incidents
+
+from data.mock_data import facility_status, gate_density, live_incidents, transport_status, weather
 from utils.genai_client import ask_genai
+from utils.status_icons import facility_ok_icon, severity_icon
 
 SYSTEM_PROMPT = """You are the operations-intelligence AI for a FIFA World Cup 2026
 stadium control room. You receive live feeds from gates, transit, facilities, weather,
@@ -57,8 +59,7 @@ def render():
 
     with st.expander("Live incident log", expanded=True):
         for i in incidents:
-            sev_icon = "🔴" if i["severity"] == "High" else "🟡" if i["severity"] == "Medium" else "🟢"
-            st.write(f"{sev_icon} `{i['time']}` **{i['zone']}** — {i['type']} ({i['severity']})")
+            st.write(f"{severity_icon(i['severity'])} `{i['time']}` **{i['zone']}** — {i['type']} ({i['severity']})")
 
     with st.expander("Transit feed"):
         for t in transit:
@@ -66,8 +67,7 @@ def render():
 
     with st.expander("Facility status"):
         for f in facilities:
-            icon = "🟢" if f["status"] == "normal" else "🔴"
-            st.write(f"{icon} {f['facility']} — {f['status']}")
+            st.write(f"{facility_ok_icon(f['status'])} {f['facility']} — {f['status']}")
 
     if st.button("Generate Command Briefing", type="primary", key="ops_btn"):
         with st.spinner("Synthesizing live feeds into a briefing..."):

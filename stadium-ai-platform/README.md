@@ -1,5 +1,7 @@
 # ⚽ Stadium Ops AI — FIFA World Cup 2026
 
+![CI](https://github.com/SHIVAMSharmaa5/stadium-ai-platform/actions/workflows/ci.yml/badge.svg)
+
 A GenAI-enabled platform that enhances stadium operations and the fan
 tournament experience across **four** of the challenge's focus areas in a
 single unified app:
@@ -25,20 +27,26 @@ the core "mandatory GenAI" requirement of the challenge.
 
 ```
 stadium-ai-platform/
-├── app.py                  # Streamlit entrypoint, tab layout
+├── app.py                    # Streamlit entrypoint, tab layout
 ├── modules/
-│   ├── navigation.py        # Module 1
-│   ├── multilingual.py       # Module 2
-│   ├── accessibility.py      # Module 3
-│   └── operations.py         # Module 4
+│   ├── navigation.py          # Module 1
+│   ├── multilingual.py        # Module 2
+│   ├── accessibility.py       # Module 3
+│   └── operations.py          # Module 4
 ├── utils/
-│   └── genai_client.py       # Single wrapper around the Anthropic API,
-│                              # shared by all 4 modules, with demo-mode
-│                              # fallback so the app runs without a key
+│   ├── genai_client.py        # Single wrapper around the Anthropic API,
+│   │                           # shared by all 4 modules, with demo-mode
+│   │                           # fallback so the app runs without a key
+│   └── status_icons.py        # Shared status→emoji lookup (gate/severity/
+│                               # facility), avoids duplicated ternaries
 ├── data/
-│   └── mock_data.py          # Simulated real-time sensor/transit/incident
-│                              # feeds (swap for real IoT/transit APIs in prod)
-├── requirements.txt
+│   └── mock_data.py           # Simulated real-time sensor/transit/incident
+│                               # feeds (swap for real IoT/transit APIs in prod)
+├── tests/                     # Unit tests for every module (28 tests)
+├── .github/workflows/ci.yml   # Lint + test on every push/PR
+├── pyproject.toml             # ruff lint/format config
+├── requirements.txt           # pinned runtime deps
+├── requirements-dev.txt       # + pytest, ruff
 ├── .env.example
 └── .streamlit/config.toml
 ```
@@ -66,16 +74,35 @@ The app runs in **demo mode** with realistic fallback responses if no API key
 is set, so it's fully explorable without any setup — set `ANTHROPIC_API_KEY`
 to enable live model calls.
 
+## Testing & linting
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/ -v      # 28 tests, covering all 4 modules + shared utils
+ruff check .           # lint (also runs in CI on every push)
+```
+
+CI (`.github/workflows/ci.yml`) runs both automatically on every push/PR.
+
 ## Design choices & evaluation criteria
 
 - **Code quality:** modular by concern (one file per feature), a single
-  shared GenAI client to avoid duplicated API logic, docstrings throughout.
+  shared GenAI client to avoid duplicated API logic, shared `status_icons.py`
+  helper instead of repeated inline ternaries, type hints on data/client
+  functions, docstrings throughout, ruff-enforced style with zero lint
+  warnings.
 - **Security:** API key loaded from environment only, never hardcoded;
-  `.env` is gitignored; no secrets committed.
+  `.env` is gitignored; no secrets committed; dependencies pinned to exact
+  versions (`requirements.txt`) to avoid unreviewed transitive upgrades;
+  GenAI call failures are logged server-side only — raw exception details
+  are never surfaced to the UI.
 - **Efficiency:** one lightweight shared client, mock data generation is
   O(1) per render, no unnecessary re-renders of unrelated tabs.
-- **Testing:** see `tests/` for unit tests on the mock data generator and
-  the GenAI client's demo-mode fallback behavior (no network required).
+- **Testing:** 28 unit tests across `tests/` covering the mock data
+  generator, the GenAI client's demo-mode/failure fallback behavior (no
+  network required), the shared status-icon helper, and a render-smoke +
+  prompt-integrity test for every one of the 4 feature modules. Runs in CI
+  on every push.
 - **Accessibility:** module 3 is dedicated to accessibility; the UI itself
   uses Streamlit's native components (screen-reader friendly), high-contrast
   theme, and text-first output rather than icon-only signals.

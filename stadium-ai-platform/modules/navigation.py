@@ -8,8 +8,10 @@ and an alternate if their preferred gate is congested.
 """
 
 import streamlit as st
-from data.mock_data import gate_density, ZONES
+
+from data.mock_data import ZONES, gate_density
 from utils.genai_client import ask_genai
+from utils.status_icons import gate_status_icon
 
 SYSTEM_PROMPT = """You are the crowd-management AI for a FIFA World Cup 2026 host stadium.
 You receive live gate occupancy data and must give fans and stewards clear,
@@ -48,10 +50,9 @@ def render():
     density = gate_density()
     st.markdown("**Live gate occupancy**")
     cols = st.columns(len(density))
-    for c, g in zip(cols, density):
-        emoji = "🔴" if g["status"] == "critical" else "🟡" if g["status"] == "busy" else "🟢"
+    for c, g in zip(cols, density, strict=True):
         c.metric(g["gate"], f"{g['occupancy_pct']}%", f"{g['est_wait_min']} min wait")
-        c.caption(f"{emoji} {g['status']}")
+        c.caption(f"{gate_status_icon(g['status'])} {g['status']}")
 
     if st.button("Get AI Route Recommendation", type="primary", key="nav_btn"):
         with st.spinner("Analyzing live gate data..."):

@@ -12,15 +12,18 @@ Kept deterministic-ish with slight randomness so the demo feels alive
 across reruns without needing any external network calls.
 """
 
+from __future__ import annotations
+
 import random
 from datetime import datetime
+from typing import Any
 
 GATES = ["Gate A (North)", "Gate B (East)", "Gate C (South)", "Gate D (West)", "Gate E (VIP)"]
 ZONES = ["Lower Bowl", "Upper Bowl", "Club Level", "Fan Fest Plaza", "Parking Deck 2"]
 LANGUAGES = ["English", "Spanish", "Portuguese", "French", "Arabic", "Mandarin", "Hindi", "Japanese"]
 
 
-def gate_density():
+def gate_density() -> list[dict[str, Any]]:
     random.seed(datetime.now().minute)  # changes each minute, stable within a run
     data = []
     for gate in GATES:
@@ -35,7 +38,7 @@ def gate_density():
     return data
 
 
-def transport_status():
+def transport_status() -> list[dict[str, Any]]:
     return [
         {"line": "Metro Red Line", "status": "On time", "next_arrival_min": 4},
         {"line": "Shuttle Bus - Lot 7", "status": "Delayed 6 min", "next_arrival_min": 11},
@@ -44,7 +47,7 @@ def transport_status():
     ]
 
 
-def facility_status():
+def facility_status() -> list[dict[str, Any]]:
     return [
         {"facility": "Restrooms - Lower Bowl East", "status": "normal"},
         {"facility": "Concessions - Section 114", "status": "long queue"},
@@ -54,11 +57,11 @@ def facility_status():
     ]
 
 
-def weather():
+def weather() -> dict[str, Any]:
     return {"condition": "Partly cloudy", "temp_c": 29, "heat_index_c": 33, "advisory": "Elevated heat - hydration advised"}
 
 
-def live_incidents():
+def live_incidents() -> list[dict[str, Any]]:
     return [
         {"time": "17:42", "zone": "Gate B (East)", "type": "Congestion", "severity": "Medium"},
         {"time": "17:38", "zone": "Parking Deck 2", "type": "Vehicle blocking exit lane", "severity": "Low"},
