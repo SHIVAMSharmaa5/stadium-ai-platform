@@ -43,6 +43,16 @@ def _install_streamlit_stub():
         def __exit__(self, *exc):
             return False
 
+    def _passthrough_decorator(*_args, **_kwargs):
+        """No-op stand-in for st.cache_data / st.cache_resource: returns
+        the function unchanged so cached functions still work under test."""
+        def _wrap(func):
+            return func
+        # Support both @st.cache_data and @st.cache_data(ttl=60) usage
+        if len(_args) == 1 and callable(_args[0]) and not _kwargs:
+            return _args[0]
+        return _wrap
+
     st.subheader = _passthrough
     st.caption = _passthrough
     st.markdown = _passthrough
@@ -60,6 +70,8 @@ def _install_streamlit_stub():
     st.expander = lambda *a, **k: _Expander()
     st.divider = _passthrough
     st.metric = _passthrough
+    st.cache_data = _passthrough_decorator
+    st.cache_resource = _passthrough_decorator
     st.session_state = {}
     sys.modules["streamlit"] = st
     return st

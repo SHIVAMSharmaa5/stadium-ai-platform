@@ -18,11 +18,14 @@ import random
 from datetime import datetime
 from typing import Any
 
+import streamlit as st
+
 GATES = ["Gate A (North)", "Gate B (East)", "Gate C (South)", "Gate D (West)", "Gate E (VIP)"]
 ZONES = ["Lower Bowl", "Upper Bowl", "Club Level", "Fan Fest Plaza", "Parking Deck 2"]
 LANGUAGES = ["English", "Spanish", "Portuguese", "French", "Arabic", "Mandarin", "Hindi", "Japanese"]
 
 
+@st.cache_data(ttl=60, show_spinner=False)
 def gate_density() -> list[dict[str, Any]]:
     random.seed(datetime.now().minute)  # changes each minute, stable within a run
     data = []
@@ -38,6 +41,7 @@ def gate_density() -> list[dict[str, Any]]:
     return data
 
 
+@st.cache_data(ttl=60, show_spinner=False)
 def transport_status() -> list[dict[str, Any]]:
     return [
         {"line": "Metro Red Line", "status": "On time", "next_arrival_min": 4},
@@ -47,6 +51,7 @@ def transport_status() -> list[dict[str, Any]]:
     ]
 
 
+@st.cache_data(ttl=60, show_spinner=False)
 def facility_status() -> list[dict[str, Any]]:
     return [
         {"facility": "Restrooms - Lower Bowl East", "status": "normal"},
@@ -57,10 +62,12 @@ def facility_status() -> list[dict[str, Any]]:
     ]
 
 
+@st.cache_data(ttl=300, show_spinner=False)
 def weather() -> dict[str, Any]:
     return {"condition": "Partly cloudy", "temp_c": 29, "heat_index_c": 33, "advisory": "Elevated heat - hydration advised"}
 
 
+@st.cache_data(ttl=30, show_spinner=False)
 def live_incidents() -> list[dict[str, Any]]:
     return [
         {"time": "17:42", "zone": "Gate B (East)", "type": "Congestion", "severity": "Medium"},

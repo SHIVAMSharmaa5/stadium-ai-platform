@@ -16,6 +16,8 @@ import json
 import logging
 import os
 
+import streamlit as st
+
 try:
     import anthropic
     _ANTHROPIC_AVAILABLE = True
@@ -36,7 +38,15 @@ GENAI_FAILURE_NOTICE = (
 )
 
 
+@st.cache_resource(show_spinner=False)
 def _get_client() -> anthropic.Anthropic | None:
+    """
+    Cached with st.cache_resource: Streamlit reruns the entire script on
+    every widget interaction, so without caching this would construct a
+    brand-new HTTP client/connection pool on every single click. Caching
+    it as a resource means the client (and its underlying connection
+    pool) is built once per session and reused.
+    """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key or not _ANTHROPIC_AVAILABLE:
         return None

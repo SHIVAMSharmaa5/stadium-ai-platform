@@ -96,8 +96,12 @@ CI (`.github/workflows/ci.yml`) runs both automatically on every push/PR.
   versions (`requirements.txt`) to avoid unreviewed transitive upgrades;
   GenAI call failures are logged server-side only — raw exception details
   are never surfaced to the UI.
-- **Efficiency:** one lightweight shared client, mock data generation is
-  O(1) per render, no unnecessary re-renders of unrelated tabs.
+- **Efficiency:** `st.cache_resource` on the Anthropic client (Streamlit
+  reruns the whole script on every interaction, so without this a fresh
+  client/connection pool was being built on every click); `st.cache_data`
+  (30-60s TTL) on every live-data generator in `mock_data.py` so gate,
+  transit, facility, weather, and incident data aren't recomputed from
+  scratch on every rerun; no unnecessary re-renders of unrelated tabs.
 - **Testing:** 28 unit tests across `tests/` covering the mock data
   generator, the GenAI client's demo-mode/failure fallback behavior (no
   network required), the shared status-icon helper, and a render-smoke +
